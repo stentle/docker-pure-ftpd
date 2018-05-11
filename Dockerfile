@@ -1,7 +1,6 @@
 FROM debian:stretch
 
-# feel free to change this ;)
-LABEL maintainer "Andrew Stilliard <andrew.stilliard@gmail.com>"
+LABEL maintainer "Stentle Hackers <hackers@stentle.com>"
 
 # properly setup debian sources
 ENV DEBIAN_FRONTEND noninteractive
@@ -53,10 +52,16 @@ RUN chmod u+x /run.sh
 # default publichost, you'll need to set this for passive support
 ENV PUBLICHOST localhost
 
+# default ports for passive mode and other settings
+ENV PASV_PORT_MIN 30000
+ENV PASV_PORT_MAX 30009
+ENV PASV_CLIENTS_MAX 5
+ENV PASV_CLIENTS_X_IP_MAX 5
+
 # couple available volumes you may want to use
-VOLUME ["/home/ftpusers", "/etc/pure-ftpd/passwd"]
+VOLUME ["/home/ftpusers"]
 
 # startup
-CMD /run.sh -c 5 -C 5 -l puredb:/etc/pure-ftpd/pureftpd.pdb -E -j -R -P $PUBLICHOST -p 30000:30009
+CMD /run.sh -c $PASV_CLIENTS_MAX -C $PASV_CLIENTS_X_IP_MAX -l puredb:/etc/pure-ftpd/pureftpd.pdb -E -j -R -P $PUBLICHOST -p $PASV_PORT_MIN:$PASV_PORT_MAX
 
-EXPOSE 21 30000-30009
+EXPOSE 21 $PASV_PORT_MIN-$PASV_PORT_MAX
